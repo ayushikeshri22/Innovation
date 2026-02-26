@@ -1,6 +1,6 @@
-import { scrapeSitemap } from "./scrapeSitemap.js";
-import { analyzeUrl } from "./runPerformance.js";
-import saveResults from "./helpers/saveFile.js"
+import {scrapeSitemap}  from "./helper/scrapeSitemap.js"
+import {analyzeUrl}  from "./helper/runPerformance.js";
+import saveResults from "./helper/saveFile.js"
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
