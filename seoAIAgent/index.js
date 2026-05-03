@@ -1,11 +1,16 @@
-import {scrapeSitemap}  from "./helper/scrapeSitemap.js"
-import {analyzeUrl}  from "./helper/runPerformance.js";
-import saveResults from "./helper/saveFile.js"
+import dotenv from "dotenv";
+import { scrapeSitemap } from "./helper/scrapeSitemap.js";
+import { analyzeUrl } from "./helper/runPerformance.js";
+import saveResults from "./helper/saveFile.js";
+import { analyzeReport } from "./llm/analyzeReport.js";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+dotenv.config();
 
 async function prepareFinalUrlList() {
-  const allSitemapUrls = await scrapeSitemap("https://www.victoriassecret.com/sitemaps/en/us/product-1.xml");
+  const allSitemapUrls = await scrapeSitemap(
+    "https://www.victoriassecret.com/sitemaps/en/us/product-1.xml",
+  );
 
   console.log("Fetching sitemap...");
 
@@ -30,7 +35,20 @@ async function prepareFinalUrlList() {
   console.log("Analysis complete!");
   console.log("Total successful:", results.length);
 
-  saveResults(results)
+  // get LLM analysis
+  try {
+    console.log("Analyzing with LLM...");
+    const llmSeoAnalysis = await analyzeReport(...results);
+    console.log("LLM Analysis complete!");
+
+    saveResults(llmSeoAnalysis, 'llmSeoAnalysis.json');
+  } catch (error) {
+    console.error("Error during LLM analysis:", error);
+    console.log("Shutting down process!!");
+    return;
+  }
+
+  saveResults(results, 'results.json');
 
   console.log("Saved results.json");
 }
