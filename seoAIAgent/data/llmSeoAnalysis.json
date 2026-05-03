@@ -1,46 +1,53 @@
 {
   "tickets": [
     {
-      "title": "Reduce Extremely High Largest Contentful Paint (LCP)",
-      "description": "The LCP is currently 12,737ms, which is significantly above the recommended 2,500ms threshold. This is likely caused by the late loading of product images and render-blocking resources.",
-      "priority": "High",
-      "impact": "Core Web Vitals failure, which negatively affects search engine rankings and causes high user drop-off rates.",
-      "fix": "Optimize the LCP element (product hero image) by using the 'priority' attribute or 'fetchpriority=high'. Preload the main product image and ensure it is served in modern formats like AVIF or WebP. Additionally, address the render-blocking CSS file 'style.css' which is causing a 300ms delay."
+      "title": "Critical: Massive Largest Contentful Paint (LCP) Delay",
+      "description": "The LCP is currently 17,089ms, which is significantly higher than the Google-recommended threshold of 2,500ms. This is a critical failure for Core Web Vitals that directly impacts SEO rankings and user retention.",
+      "priority": "Highest",
+      "impact": "Search Engine Ranking and User Conversion",
+      "fix": "Identify the hero image (likely the product image) and ensure it is not lazy-loaded. Use <link rel='preload' as='image'> for the LCP candidate. Reduce main-thread execution time by deferring non-critical JavaScript."
     },
     {
-      "title": "Eliminate Excessive Unused JavaScript",
-      "description": "The report identifies approximately 1.6MB of unused JavaScript. Key offenders include '6507.js' (307KB wasted) and 'radar.min.js' (210KB wasted). Total Blocking Time (TBT) is high at 2,315ms.",
+      "title": "Eliminate Unused JavaScript (1.6MB)",
+      "description": "There is approximately 1,639KB of unused JavaScript being loaded. High-impact files include 'radar.min.js' (83% unused) and '6507.js' (60% unused). This causes massive overhead and pushes TTI to over 37 seconds.",
       "priority": "High",
-      "impact": "Heavy main-thread load delays Time to Interactive (TTI) and increases data costs for mobile users.",
-      "fix": "Implement code-splitting to ensure only necessary code is loaded per page. Audit and remove redundant third-party scripts. Use 'defer' or 'async' for non-critical scripts, especially 'signals-sdk-5.6.7.js' and 'quantum-victoriassecret.js', which are triggering long tasks."
+      "impact": "Page Speed and Time to Interactive (TTI)",
+      "fix": "Implement code-splitting to load only necessary JS for the product page. Audit and remove redundant vendor scripts or heavy SDKs (like Signals or Radar) if they aren't required for initial page functionality."
     },
     {
-      "title": "Optimize Third-Party Tag Management",
-      "description": "Third-party scripts from Google Tag Manager, Quantum Metric, and Adobe Launch are significantly impacting the main thread (contributing over 475ms of main thread time). Multiple instances of GTM tags are firing long tasks.",
+      "title": "Reduce Total Blocking Time (TBT) and Long Tasks",
+      "description": "Total Blocking Time is 2,081ms. Multiple long tasks are exceeding 300ms, specifically from 'index.js', 'signals-sdk-5.6.7.js', and 'react-18.js'. This makes the page feel frozen to users.",
       "priority": "High",
-      "impact": "Main thread congestion prevents the page from responding to user inputs efficiently.",
-      "fix": "Consolidate tags within GTM and remove unused pixels (e.g., Snapchat, Pinterest, or Taboola if not actively used for attribution). Use a 'Request Idle Callback' strategy for non-essential tracking scripts to prioritize page rendering."
+      "impact": "Responsiveness and User Experience",
+      "fix": "Break up long-running JavaScript tasks using requestIdleCallback or Web Workers. Move non-essential scripts (tracking/analytics) to load after the window load event."
     },
     {
-      "title": "Fix Missing Image Alt Text",
-      "description": "There are 2 images missing alt attributes. While simple, this is a fundamental SEO and accessibility requirement.",
+      "title": "Shorten Meta Description and Page Title",
+      "description": "The meta description length is 229 characters (standard is ~160) and the title length is 78 characters (standard is ~60). This leads to truncation in Search Engine Results Pages (SERPs).",
       "priority": "Medium",
-      "impact": "Decreased accessibility for screen-reader users and missed opportunities for Image Search rankings.",
-      "fix": "Audit the HTML for all <img> tags and Button-wrapped images and ensure the 'alt' attribute contains descriptive, keyword-relevant text."
+      "impact": "Click-Through Rate (CTR) from Google",
+      "fix": "Rewrite the meta description to be under 160 characters and ensure the Page Title is under 60 characters to prevent truncation."
     },
     {
-      "title": "Resolve JavaScript Geolocation and Event Errors",
-      "description": "The console report shows failures in fetching store data via geolocation and several 'Unrecognized event name' errors.",
+      "title": "Consolidate Excessive Network Requests (342 total)",
+      "description": "The page makes 342 network requests. A massive portion of these are third-party tracking pixels (Facebook, Bing, Pinterest, Adobe, etc.), which creates heavy network contention.",
       "priority": "Medium",
-      "impact": "Degraded user experience for store-locator features and potential data corruption in analytics tracking.",
-      "fix": "Debug the geolocation API call to handle permission denials gracefully. Investigate the event listener implementation to ensure all triggered event names are properly defined in the application logic."
+      "impact": "Performance and Browser Overhead",
+      "fix": "Audit third-party tags. Use a Server-Side Tag Management solution to move tracking logic off the client-side browser, or implement strict loading sequences where trackers load only after user interaction."
     },
     {
-      "title": "Optimize SEO Title Length",
-      "description": "The current title length is 88 characters, which exceeds the optimal 50-60 character range for search engine result pages (SERPs).",
+      "title": "Fix Missing Image Alt Attributes",
+      "description": "Two images are missing alt attributes, which negatively impacts Accessibility and Image SEO.",
       "priority": "Low",
-      "impact": "Titles will be truncated in search results, potentially reducing click-through rates (CTR).",
-      "fix": "Rewrite the title tag to be more concise (e.g., under 60 characters) while retaining primary keywords like 'Tech Woven Retro Shorts' and the brand name."
+      "impact": "Accessibility and Image SEO",
+      "fix": "Identify the two images using the selector 'prism-image' and add descriptive alt text."
+    },
+    {
+      "title": "Resolve Geolocation and JS Console Errors",
+      "description": "The site is throwing errors: 'Failed to fetch store via geolocation' and 'Unrecognized event name'. This suggests logic breaks in the frontend scripts.",
+      "priority": "Low",
+      "impact": "Site Stability",
+      "fix": "Debug store geolocation logic to handle denial of permissions gracefully and audit event names passed to the analytics layer to ensure they are defined."
     }
   ]
 }

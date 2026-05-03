@@ -5,7 +5,7 @@ const ANALYSIS_PROMPT = `You are an SEO and web performance expert.
 Your job:
 1. Analyze the given JSON report
 2. Identify issues
-3. Prioritize them (High, Medium, Low)
+3. Prioritize them (Highest, High, Medium, Low, Lowest)
 4. Suggest fixes
 5. Output in STRICT JSON format
 
