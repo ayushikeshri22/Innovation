@@ -1,53 +1,172 @@
 {
   "tickets": [
     {
-      "title": "Critical: Massive Largest Contentful Paint (LCP) Delay",
-      "description": "The LCP is currently 17,089ms, which is significantly higher than the Google-recommended threshold of 2,500ms. This is a critical failure for Core Web Vitals that directly impacts SEO rankings and user retention.",
+      "title": "Critical: Largest Contentful Paint (LCP) is extremely high",
+      "description": "LCP was measured at 20665ms, which is significantly above the recommended 2.5s threshold for a good user experience.",
       "priority": "Highest",
-      "impact": "Search Engine Ranking and User Conversion",
-      "fix": "Identify the hero image (likely the product image) and ensure it is not lazy-loaded. Use <link rel='preload' as='image'> for the LCP candidate. Reduce main-thread execution time by deferring non-critical JavaScript."
+      "impact": "Severely affects user perceived loading speed and search engine rankings.",
+      "fix": "Optimize the critical rendering path, prioritize the loading of the hero image, and reduce main-thread execution time by deferred non-critical JavaScript."
     },
     {
-      "title": "Eliminate Unused JavaScript (1.6MB)",
-      "description": "There is approximately 1,639KB of unused JavaScript being loaded. High-impact files include 'radar.min.js' (83% unused) and '6507.js' (60% unused). This causes massive overhead and pushes TTI to over 37 seconds.",
+      "title": "Critical: Time to Interactive (TTI) exceeds 40 seconds",
+      "description": "TTI is 40478ms. This means the page takes over 40 seconds to become fully responsive to user input.",
+      "priority": "Highest",
+      "impact": "Frustrates users who attempt to interact with the page before it is ready, leading to high bounce rates.",
+      "fix": "Minimize main-thread work, reduce JavaScript execution time, and remove unused scripts."
+    },
+    {
+      "title": "High: Total Blocking Time (TBT) is suboptimal",
+      "description": "TBT is 3672ms. Large blocking tasks are preventing the main thread from handling user interactions.",
       "priority": "High",
-      "impact": "Page Speed and Time to Interactive (TTI)",
-      "fix": "Implement code-splitting to load only necessary JS for the product page. Audit and remove redundant vendor scripts or heavy SDKs (like Signals or Radar) if they aren't required for initial page functionality."
+      "impact": "Reduces the responsiveness of the UI during page load.",
+      "fix": "Break up long tasks (tasks > 50ms) into smaller chunks and optimize third-party script execution."
     },
     {
-      "title": "Reduce Total Blocking Time (TBT) and Long Tasks",
-      "description": "Total Blocking Time is 2,081ms. Multiple long tasks are exceeding 300ms, specifically from 'index.js', 'signals-sdk-5.6.7.js', and 'react-18.js'. This makes the page feel frozen to users.",
+      "title": "Medium: Cumulative Layout Shift (CLS) exceeds threshold",
+      "description": "CLS is 0.112, which is above the 'Good' threshold of 0.1.",
+      "priority": "Medium",
+      "impact": "Causes unexpected movement of page elements, resulting in a poor user experience.",
+      "fix": "Ensure all images and dynamic elements have explicit width and height attributes or reserved space via CSS."
+    },
+    {
+      "title": "Highest: Excessive Unused JavaScript (1.5 MB)",
+      "description": "The page loads approximately 1522 KB of JavaScript that is not executed during initial page load.",
+      "priority": "Highest",
+      "impact": "Increases data usage, extends parsing/compilation time, and delays TTI.",
+      "fix": "Implement code splitting, use dynamic imports for non-essential features, and audit third-party libraries."
+    },
+    {
+      "title": "High: Large Unused JS in '6507.js'",
+      "description": "The script 'https://www.victoriassecret.com/assets/m5553-b3wLxfIJTeKsu4qBiUGbw/mobile/6507.js' contains 308 KB of unused code (60.3%).",
       "priority": "High",
-      "impact": "Responsiveness and User Experience",
-      "fix": "Break up long-running JavaScript tasks using requestIdleCallback or Web Workers. Move non-essential scripts (tracking/analytics) to load after the window load event."
+      "impact": "Significant contribution to main-thread bloat.",
+      "fix": "Review the contents of this bundle and move non-critical functions to a deferred or on-demand script."
     },
     {
-      "title": "Shorten Meta Description and Page Title",
-      "description": "The meta description length is 229 characters (standard is ~160) and the title length is 78 characters (standard is ~60). This leads to truncation in Search Engine Results Pages (SERPs).",
+      "title": "High: Large Unused JS in 'radar.min.js'",
+      "description": "The vendor script 'radar.min.js' has 210 KB of unused code (83.5%).",
+      "priority": "High",
+      "impact": "Inefficient loading of vendor functionality.",
+      "fix": "Check if this SDK can be initialized only when needed or if a lighter version is available."
+    },
+    {
+      "title": "Medium: Unused JS in 'sentry-react-sdk.js'",
+      "description": "Sentry SDK contains 105 KB of unused code (67.5%).",
       "priority": "Medium",
-      "impact": "Click-Through Rate (CTR) from Google",
-      "fix": "Rewrite the meta description to be under 160 characters and ensure the Page Title is under 60 characters to prevent truncation."
+      "impact": "Adds unnecessary weight to the JS payload.",
+      "fix": "Ensure Sentry is configured to only include necessary integrations and utilize tree-shaking."
     },
     {
-      "title": "Consolidate Excessive Network Requests (342 total)",
-      "description": "The page makes 342 network requests. A massive portion of these are third-party tracking pixels (Facebook, Bing, Pinterest, Adobe, etc.), which creates heavy network contention.",
+      "title": "Medium: High Unused JS in Google Tag Manager containers",
+      "description": "Multiple GTM scripts (DC-15183814, AW-870804336, etc.) are wasting between 54 KB to 60 KB each.",
       "priority": "Medium",
-      "impact": "Performance and Browser Overhead",
-      "fix": "Audit third-party tags. Use a Server-Side Tag Management solution to move tracking logic off the client-side browser, or implement strict loading sequences where trackers load only after user interaction."
+      "impact": "Redundant tracking logic increases the script execution budget.",
+      "fix": "Audit GTM tags and triggers; remove obsolete tags or consolidate marketing pixels."
     },
     {
-      "title": "Fix Missing Image Alt Attributes",
-      "description": "Two images are missing alt attributes, which negatively impacts Accessibility and Image SEO.",
-      "priority": "Low",
-      "impact": "Accessibility and Image SEO",
-      "fix": "Identify the two images using the selector 'prism-image' and add descriptive alt text."
+      "title": "High: Critical Render-Blocking CSS",
+      "description": "'style.css' is blocking the first paint by 300ms.",
+      "priority": "High",
+      "impact": "Delays the rendering of the page content.",
+      "fix": "Inline critical CSS needed for above-the-fold content and load the rest of the stylesheet asynchronously."
     },
     {
-      "title": "Resolve Geolocation and JS Console Errors",
-      "description": "The site is throwing errors: 'Failed to fetch store via geolocation' and 'Unrecognized event name'. This suggests logic breaks in the frontend scripts.",
+      "title": "Low: Excessive Unused CSS in 'style.css'",
+      "description": "'style.css' contains 37.7 KB of unused CSS (97.6%).",
       "priority": "Low",
-      "impact": "Site Stability",
-      "fix": "Debug store geolocation logic to handle denial of permissions gracefully and audit event names passed to the analytics layer to ensure they are defined."
+      "impact": "Increases stylesheet size and processing time.",
+      "fix": "Use tools like PurgeCSS to remove unused selectors or split the CSS by component/page."
+    },
+    {
+      "title": "Medium: Offscreen images are not being lazy-loaded",
+      "description": "Several images (e.g., OM_B.jpg, OF_DET.jpg) are loaded but located offscreen, wasting significant bytes.",
+      "priority": "Medium",
+      "impact": "Increases initial network payload and bandwidth competition.",
+      "fix": "Implement 'loading=\"lazy\"' on all images that are not part of the initial viewport."
+    },
+    {
+      "title": "Low: Suboptimal Image Sizing (Responsive Images)",
+      "description": "Image '1118220254A2_OM_B.jpg' wastes 22.3 KB due to being served larger than its displayed size.",
+      "priority": "Low",
+      "impact": "Slightly increases page weight.",
+      "fix": "Use the 'srcset' attribute to serve appropriately sized images for different device resolutions."
+    },
+    {
+      "title": "High: Long Main-Thread Task - Product Mobile Index",
+      "description": "A long task originating from 'product/mobile/index.js' lasted 879ms.",
+      "priority": "High",
+      "impact": "Major contributor to TBT and poor interactivity.",
+      "fix": "Refactor component logic to reduce complexity or use 'requestIdleCallback' to defer non-essential processing."
+    },
+    {
+      "title": "Medium: Long Main-Thread Task - React 18 Evaluation",
+      "description": "Multiple tasks in 'react-18.js' lasted between 107ms and 471ms.",
+      "priority": "Medium",
+      "impact": "Blocks the UI during hydration and component initialization.",
+      "fix": "Optimize React component tree depth and use React.memo or useMemo to prevent unnecessary re-renders."
+    },
+    {
+      "title": "Medium: High Script Evaluation Time",
+      "description": "Script evaluation accounts for 8940ms of the total main thread work.",
+      "priority": "Medium",
+      "impact": "Primary reason for high TTI and TBT.",
+      "fix": "Reduce the total amount of JS being shipped and evaluate scripts only when required."
+    },
+    {
+      "title": "Medium: Metadata - Meta Description is too long",
+      "description": "The meta description is 520 characters, which exceeds the recommended ~160 character limit.",
+      "priority": "Medium",
+      "impact": "Description will be truncated in search results, potentially reducing click-through rate.",
+      "fix": "Rewrite meta description to be concise (between 120-160 characters)."
+    },
+    {
+      "title": "Low: Metadata - Page Title is too long",
+      "description": "The page title is 97 characters, which exceeds the recommended ~60 character limit.",
+      "priority": "Low",
+      "impact": "Title will be truncated in search engine results pages (SERPs).",
+      "fix": "Shorten the page title to under 60 characters while keeping primary keywords."
+    },
+    {
+      "title": "Medium: Missing Image Alt Attributes",
+      "description": "2 images are missing 'alt' attributes.",
+      "priority": "Medium",
+      "impact": "Negative impact on accessibility (screen readers) and image SEO.",
+      "fix": "Add descriptive alt text to all <img> elements."
+    },
+    {
+      "title": "Medium: JavaScript Runtime Error - Geolocation",
+      "description": "Error: 'Failed to fetch store via geolocation: JSHandle@object'.",
+      "priority": "Medium",
+      "impact": "Broken functionality for users relying on store locators.",
+      "fix": "Debug the geolocation API implementation to handle denied permissions or fetch failures gracefully."
+    },
+    {
+      "title": "Low: JavaScript Runtime Error - Undefined Event",
+      "description": "Error: 'Unrecognized event name: undefined'.",
+      "priority": "Low",
+      "impact": "Potential loss of analytics data and cluttering of console logs.",
+      "fix": "Validate analytics event triggers to ensure event names are defined before being called."
+    },
+    {
+      "title": "Low: Font Loading Optimization",
+      "description": "PublicSans fonts are loaded via CSS; ensure no invisible text during load.",
+      "priority": "Low",
+      "impact": "Presents a 'flash of invisible text' (FOIT) risk.",
+      "fix": "Add 'font-display: swap;' to @font-face declarations in the CSS."
+    },
+    {
+      "title": "High: Third-Party Script Impact - Quantum Metric",
+      "description": "Quantum Metric script contributed 154ms to blocking time.",
+      "priority": "High",
+      "impact": "Reduces performance for the sake of session recording.",
+      "fix": "Consider loading Quantum Metric with a delay or only on specific high-value interactions."
+    },
+    {
+      "title": "High: Third-Party Script Impact - Adobe Tag Manager",
+      "description": "Adobe Tag Manager (launch-7ac2a4117ce6.min.js) significantly impacts the main thread.",
+      "priority": "High",
+      "impact": "Adds to script evaluation overhead.",
+      "fix": "Optimize rules within Adobe Launch to ensure scripts are only loaded when necessary conditions are met."
     }
   ]
 }

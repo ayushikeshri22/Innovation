@@ -1,9 +1,8 @@
-
-export function createJiraPayload(issue) {
+export function createJiraPayload(issue, url) {
   return {
     fields: {
       project: {
-        key: 'SEO',
+        key: "SEO",
       },
       summary: issue.title || "SEO Issue",
       description: {
@@ -15,11 +14,11 @@ export function createJiraPayload(issue) {
             content: [
               {
                 type: "text",
-                text: `${issue.description || "No description"}\n\nSuggested Fix:\n${issue.fix || "N/A"}`
-              }
-            ]
-          }
-        ]
+                text: `URL: ${url}\n\nDescription:\n${issue.description || "No description"}\n\nSuggested Fix:\n${issue.fix || "N/A"}`,
+              },
+            ],
+          },
+        ],
       },
       issuetype: {
         name: "Bug",

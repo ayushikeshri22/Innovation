@@ -6,6 +6,7 @@ import { analyzeReport } from "./llm/analyzeReport.js";
 import { createJiraPayload } from "./jira/createJiraPayload.js";
 import { createJiraTicket } from "./jira/createJiraTicket.js";
 import llmData from "./data/llmSeoAnalysis.json" with { type: "json" };
+import cleanReportData from "./helper/cleanReportData.js";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 dotenv.config();
@@ -41,9 +42,11 @@ async function prepareFinalUrlList() {
 
   // get LLM analysis
   let llmSeoAnalysis = {};
+  const sanitizedResult = cleanReportData(...results);
+
   try {
     console.log("Analyzing with LLM...");
-    llmSeoAnalysis = await analyzeReport(...results);
+    llmSeoAnalysis = await analyzeReport(sanitizedResult);
     console.log("LLM Analysis complete!");
 
     saveResults(llmSeoAnalysis, 'llmSeoAnalysis.json');
@@ -60,7 +63,7 @@ async function prepareFinalUrlList() {
     console.log("Suggested Fix:", issue.fix);
     console.log("Impact:", issue.impact);
     console.log("-----------------------------");
-    const payload = createJiraPayload(issue);
+    const payload = createJiraPayload(issue, sample[0]);
     createJiraTicket(payload)
       .then((response) => {
         console.log("Jira ticket created:", response.key);
