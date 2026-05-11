@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 const ANALYSIS_PROMPT = `You are an SEO and web performance expert.
 
@@ -37,44 +37,42 @@ Return format:
   ]
 }
 
+FIX GENERATION REQUIREMENTS:
+The "fix" field MUST:
+- contain detailed sequential implementation steps
+- explain HOW to fix the issue
+- explain WHY the issue happens
+- include frontend/backend/build-pipeline recommendations where relevant
+- include optimization techniques
+- include framework-specific suggestions if inferable
+- include code-level recommendations where possible
+- include caching/CDN/compression/loading recommendations where relevant
+- include image/font/script optimization recommendations where relevant
+- include SEO metadata/content recommendations where relevant
+- include accessibility remediation guidance where relevant
+- contain enough detail that a developer can directly implement the fix
+
 Report: `;
-// `You are an SEO and web performance expert.
-
-// Your job:
-// 1. Analyze the given JSON report
-// 2. Identify issues
-// 3. Prioritize them (Highest, High, Medium, Low, Lowest)
-// 4. Suggest fixes
-// 5. Output in STRICT JSON format
-
-// Return ONLY valid JSON:
-// {
-//   "tickets": [
-//     {
-//       "title": "",
-//       "description": "",
-//       "priority": "",
-//       "impact": "",
-//       "fix": ""
-//     }
-//   ]
-// }
-
-// Report:
-// `;
 
 async function analyzeReport(report) {
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({
-    model: "gemini-3-flash-preview",
+  const ai = new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY,
   });
 
   const prompt = `${ANALYSIS_PROMPT}${JSON.stringify(report)}`;
-  const result = await model.generateContent(prompt);
-  const text = result.response.text();
+
+  const response = await ai.models.generateContent({
+    model: "gemini-3-flash-preview",
+    contents: prompt,
+    config: {
+      responseMimeType: "application/json",
+    },
+  });
+
+  const output = JSON.parse(response.text);
 
   // Parse and return the JSON response
-  return JSON.parse(text);
+  return output;
 }
 
 export { analyzeReport };

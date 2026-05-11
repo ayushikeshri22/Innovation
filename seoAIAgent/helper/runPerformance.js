@@ -56,6 +56,11 @@ export async function analyzeUrl(url) {
   await browser.close();
   await chrome.kill();
 
+  // returns all the audit data for LLM analysis and ticket generation
+  return audits;
+
+  // TODO: do we need this?
+  // returns a structured report with all relevant data for LLM analysis and ticket generation
   return {
     url,
     technical_seo: {
