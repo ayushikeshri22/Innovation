@@ -23,6 +23,7 @@ jobs:
         run: npm install
 
       - name: Run SEO AI Agent
+        working-directory: ./seoAIAgent
         run: node index.js
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
